@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Персональный план тренировок с учётом ваших целей, времени и оборудования. ИИ-гид для взрослых от 18 лет.">
+  <title>Ритм — ИИ-гид по фитнес-программам</title>
+  <link rel="stylesheet" href="/assets/style.css"><script defer src="/assets/app.js"></script>
+</head>
+<body>
+  <header class="header wrap">
+    <a class="brand" href="/" aria-label="Ритм — главная"><span class="brand-mark">р.</span> ритм<span class="brand-sub">ИИ-гид по фитнесу</span></a>
+    <nav aria-label="Основная навигация"><a href="#builder">Моя анкета</a><a href="#programs">Моя программа</a><a id="telegram" hidden rel="noopener" target="_blank">В Telegram ↗</a></nav>
+    <span class="age-badge">18+</span>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-copy"><div class="eyebrow"><span class="dot"></span> ДВИЖЕНИЕ В ВАШЕМ ТЕМПЕ</div>
+        <h1>Ваша цель.<br>Ваш темп.<br><span>Ваш план.</span></h1>
+        <p>Тренировки, которые вписываются в жизнь.<br>Расскажите о себе — вместе найдём ваш ритм.</p>
+        <a class="button" href="#builder">Составить программу <span>↗</span></a>
+        <div class="hero-facts"><span>01 <b>Без лишнего оборудования</b></span><span>02 <b>С учётом вашего опыта</b></span></div>
+      </div>
+      <div class="hero-art" aria-label="Иллюстрация: недельный ритм тренировок">
+        <div class="art-ring ring-one"></div><div class="art-ring ring-two"></div>
+        <div class="art-label">МАЛЕНЬКИЕ ШАГИ.<br>НОВЫЕ ВОЗМОЖНОСТИ.</div>
+        <div class="art-word">MOVE<br><span>YOUR WAY.</span></div>
+        <div class="week-card"><span class="eyebrow">ВАША НЕДЕЛЯ В БАЛАНСЕ</span><div class="week"><i>ПН</i><i class="active">ВТ</i><i>СР</i><i class="active">ЧТ</i><i>ПТ</i><i class="active">СБ</i><i>ВС</i></div><small>Тренировки и время на восстановление</small></div>
+        <span class="art-foot">Свой ритм есть у каждого ↗</span>
+      </div>
+    </section>
+    <section id="builder" class="builder">
+      <aside class="builder-aside"><div class="eyebrow">НАЧНЁМ С ВАС</div><h2>Хороший план<br>начинается<br>с знакомства.</h2><p>Несколько вопросов помогут учесть ваши возможности и пожелания.</p>
+        <ol class="steps" id="steps"><li class="selected"> <span>01</span><div><b>О вас</b><small>Цель и опыт</small></div></li><li><span>02</span><div><b>Ваши условия</b><small>Место, время, оборудование</small></div></li><li><span>03</span><div><b>Важные детали</b><small>Ограничения и пожелания</small></div></li><li><span>04</span><div><b>Всё верно?</b><small>Проверка перед началом</small></div></li></ol>
+        <div class="privacy-note"><span>↳</span><p>Ваши ответы нужны для подбора программы. Сайт и бот пока используют отдельные профили.</p></div>
+      </aside>
+      <div class="form-card">
+        <div class="form-top"><span id="step-label">ШАГ 1 ИЗ 4</span><span>В вашем темпе</span></div>
+        <div class="progress"><div id="progress-bar"></div></div>
+        <form id="profile-form">
+          <fieldset data-step="0"><legend>Давайте познакомимся</legend><p class="intro">У каждого своя точка старта. Какая у вас?</p>
+            <label for="goal">Ваша основная цель</label><select id="goal" name="goal" required><option value="">Выберите цель</option><option>Общая физическая форма</option><option>Развитие силы</option><option>Развитие выносливости</option><option>Регулярная физическая активность</option><option>Снижение массы тела</option></select>
+            <div class="form-row"><div><label for="age">Возраст</label><input id="age" name="age" type="number" min="18" max="120" placeholder="Например, 28" required><small>Сервис для взрослых от 18 лет</small></div><div><label for="level">Опыт тренировок</label><select id="level" name="fitness_level" required><option value="beginner">Начинаю с основ</option><option value="intermediate">Уже есть опыт</option><option value="advanced">Тренируюсь регулярно</option></select></div></div>
+            <label for="activity">Как много движения в вашей жизни?</label><textarea id="activity" name="current_activity" maxlength="500" minlength="2" placeholder="Например: сидячая работа, гуляю по вечерам" required></textarea>
+          </fieldset>
+          <fieldset data-step="1" hidden><legend>Подстроимся под вашу жизнь</legend><p class="intro">Реалистичный план проще сделать привычкой.</p>
+            <label for="location">Где будем заниматься?</label><select id="location" name="training_location"><option value="home">Дома</option><option value="gym">В зале</option><option value="outdoor">На улице</option></select>
+            <div class="form-row"><div><label for="sessions">Занятий в неделю</label><input id="sessions" name="sessions_per_week" type="number" min="1" max="7" value="3" required></div><div><label for="duration">Минут на занятие</label><input id="duration" name="session_duration_minutes" type="number" min="10" max="180" value="30" required></div></div>
+            <label for="equipment">Доступное оборудование</label><input id="equipment" name="equipment" maxlength="500" placeholder="Коврик, гантели — через запятую"><small>Оставьте пустым, если тренируетесь без оборудования.</small>
+          </fieldset>
+          <fieldset data-step="2" hidden><legend>Учтём важные детали</legend><p class="intro">Комфорт и самочувствие важнее гонки за результатом.</p>
+            <label for="health-status">Ограничения, травмы или запреты врача</label><select id="health-status" name="health_info_status"><option value="provided">Хочу сообщить</option><option value="declined">Предпочитаю не отвечать</option></select>
+            <div id="limitations-wrap"><label for="limitations">Что нужно учесть?</label><textarea id="limitations" name="limitations" maxlength="1000" placeholder="Опишите ограничения или напишите: ограничений нет" required></textarea></div>
+            <p id="decline-note" class="soft-note" hidden>Можно продолжить без ответа, но персонализация будет ограничена. Отсутствие ответа не означает отсутствие ограничений.</p>
+            <label for="preferences">Дополнительные пожелания <span class="optional">необязательно</span></label><textarea id="preferences" name="preferences" maxlength="500" placeholder="Например: без прыжков, люблю спокойный темп"></textarea>
+            <label class="checkbox"><input type="checkbox" name="data_consent" required><span>Согласна / согласен на сохранение анкеты и передачу её данных GigaChat для подбора программы. Имя и контакты модели не передаются.</span></label>
+          </fieldset>
+          <fieldset data-step="3" hidden><legend>Всё верно?</legend><p class="intro">Проверьте ответы. При необходимости вернитесь и исправьте.</p><dl id="summary" class="summary"></dl><p class="soft-note">Это информационные рекомендации. Они не заменяют индивидуальную работу с тренером или врачом.</p></fieldset>
+          <div class="form-actions"><button type="button" class="button secondary" id="back" hidden>← Назад</button><button type="button" class="button" id="next">Продолжить <span>→</span></button><button type="submit" class="button" id="save" hidden>Подтвердить анкету <span>✓</span></button></div>
+        </form>
+        <p id="form-status" class="status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+    <section id="programs" class="program-section"><div class="section-heading"><div><div class="eyebrow">СЛЕДУЮЩИЙ ШАГ</div><h2>Ваша программа</h2></div><button class="button" id="generate" disabled>Создать программу ↗</button></div>
+      <p id="connection" class="soft-note">Проверяем подключение…</p><p id="program-status" class="status" role="status" aria-live="polite"></p>
+      <div id="program-list"><div class="empty-state"><span class="empty-icon">↗</span><h3>Здесь начнётся ваш ритм</h3><p>Заполните и подтвердите анкету.<br>После этого можно создать персональный план на неделю.</p></div></div>
+      <div id="adapt-panel" class="adapt-panel" hidden><div><h3>Жизнь меняется. План тоже может.</h3><p>Опишите, что хотите изменить и почему. Если изменились время или оборудование, сначала обновите анкету.</p></div><label for="changes">Что изменилось?</label><textarea id="changes" maxlength="1500" placeholder="Например: занятие оказалось слишком сложным, не удалось закончить последние подходы"></textarea><button class="button secondary" id="adapt">Предложить изменения →</button></div>
+    </section>
+    <section class="principles"><div><span>01 / ПОД ВАС</span><h3>Не нужно начинать<br>с чужого темпа.</h3><p>Ваш опыт и доступное время — основа программы.</p></div><div><span>02 / ПОНЯТНО</span><h3>Знать, что делать.<br>Понимать, как.</h3><p>Откройте объяснение техники любого упражнения.</p></div><div><span>03 / ПОСТЕПЕННО</span><h3>Слушать себя.<br>Корректировать план.</h3><p>Оставляйте обратную связь после тренировок.</p></div></section>
+  </main>
+  <footer class="wrap footer"><a class="brand" href="/">ритм.</a><p>Учебный проект · ИИ-гид по фитнес-программам</p><span>Движение начинается с вас.</span></footer>
+  <dialog id="dialog"><button id="close-dialog" class="dialog-close" aria-label="Закрыть">✕</button><div id="dialog-body"></div></dialog>
+</body>
+</html>
