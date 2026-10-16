@@ -1,0 +1,4 @@
+interface:
+  display_name: "Создание фитнес-ассистента"
+  short_description: "Сайт и Telegram-бот с GigaChat для фитнес-программ"
+  default_prompt: "Используй $build-fitness-assistant для реализации учебного ИИ-гида с сайтом, Telegram-ботом и GigaChat API по согласованным требованиям."
