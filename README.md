@@ -6,6 +6,8 @@
 Инструкции запуска и настройки секретов — в [SETUP.md](SETUP.md).
 
 Материалы защиты: [пакет для сдачи](submission/README.md),
+[коммерческое предложение со скриншотами](submission/COMMERCIAL-PROPOSAL.pdf),
+[текст к домашнему заданию](submission/HOMEWORK-MESSAGE.md),
 [сценарий показа](submission/DEMO-SCRIPT.md),
 [пример реального ответа](submission/DEMO-EXAMPLE.md).
 

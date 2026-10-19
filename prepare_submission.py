@@ -29,7 +29,13 @@ def program_markdown(record):
 
 def main():
     DEST.mkdir(exist_ok=True)
-    data=json.loads((ROOT/'reports/stability-results.json').read_text(encoding='utf-8'))
+    raw=ROOT/'reports/stability-results.json'
+    if raw.exists():
+        data=json.loads(raw.read_text(encoding='utf-8'))
+    else:
+        saved=json.loads((DEST/'evidence.json').read_text(encoding='utf-8'))
+        data={k:v for k,v in saved.items() if k!='recorded_run'}
+        data['runs']=[saved['recorded_run']]
     run=data['runs'][0]
     assert data['synthetic_only'] and all(run['checks'].values())
     evidence={k:data[k] for k in ['date','model','prompt_version','synthetic_only','summary']}
@@ -80,7 +86,7 @@ def main():
     roots=['app.py','bot.py','requirements.txt','.env.example','.gitignore','README.md','SETUP.md',
         'start-site.ps1','start-bot.ps1','check_telegram.py','check_gigachat.py','live_acceptance.py','stability_acceptance.py','prepare_submission.py']
     files=[ROOT/name for name in roots]
-    for directory in ['fitness','web','tests','skills','submission']:
+    for directory in ['fitness','web','tests','skills','submission','tools']:
         files += [p for p in (ROOT/directory).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix not in {'.pyc','.db','.zip'}]
     files += [ROOT/'reports'/name for name in ['STABILITY-REPORT.md','stability-summary.json','SKILL-AUDIT.md']]
     archive=ROOT/'fitness-assistant-submission.zip'
