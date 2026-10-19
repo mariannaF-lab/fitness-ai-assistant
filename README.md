@@ -1,8 +1,16 @@
-# ИИ-гид по фитнес-программам
+# «Ритм» — ИИ-гид по фитнес-программам
 
-В этом репозитории находится навык Codex для создания учебного ИИ-ассистента: сайт с анкетой, Telegram-бот, общий сервер на Python и GigaChat API.
+Работающий учебный прототип: сайт и Telegram-бот с GigaChat API. Исходный код приложения находится в ветке [implement-fitness-assistant](https://github.com/mariannaF-lab/fitness-ai-assistant/tree/implement-fitness-assistant).
 
-Это **набор инструкций для разработки**, а не уже реализованный сайт или запущенный бот.
+## Материалы для сдачи
+
+- [Коммерческое предложение со скриншотами (PDF)](https://github.com/mariannaF-lab/fitness-ai-assistant/blob/implement-fitness-assistant/submission/COMMERCIAL-PROPOSAL.pdf)
+- [Текст сообщения к домашнему заданию](https://github.com/mariannaF-lab/fitness-ai-assistant/blob/implement-fitness-assistant/submission/HOMEWORK-MESSAGE.md)
+- [Полный пакет: описание, промпты, примеры и проверки](https://github.com/mariannaF-lab/fitness-ai-assistant/tree/implement-fitness-assistant/submission)
+- [Инструкция запуска](https://github.com/mariannaF-lab/fitness-ai-assistant/blob/implement-fitness-assistant/SETUP.md)
+- [Telegram-бот](https://t.me/ritm_fitness_bot)
+
+Сайт запускается локально. Бот отвечает при запущенном процессе. Скриншоты показывают действующий интерфейс на сохранённых результатах реального API-теста с вымышленной анкетой. Публичный хостинг пока не настроен.
 
 ## Навык
 
