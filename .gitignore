@@ -14,3 +14,4 @@ data/
 .validation-deps/
 .pytest_cache/
 reports/*results.json
+fitness-assistant-submission.zip
