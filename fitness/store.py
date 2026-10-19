@@ -2,6 +2,7 @@ import json
 import os
 import sqlite3
 import time
+from .llm import PROMPT_VERSION
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -79,7 +80,7 @@ class Store:
             status = "current" if version == 1 else "draft"
             cur = db.execute("INSERT INTO programs(owner,version,created,status,body,profile,model,prompt_version) VALUES (?,?,?,?,?,?,?,?)",
                 (owner, version, time.time(), status, json.dumps(body, ensure_ascii=False),
-                 json.dumps(profile, ensure_ascii=False), model, "1.0"))
+                 json.dumps(profile, ensure_ascii=False), model, PROMPT_VERSION))
             pid = cur.lastrowid
         return self.program(owner, pid)
 
@@ -103,7 +104,7 @@ class Store:
         with self.connect() as db:
             db.execute("DELETE FROM jobs WHERE expires < ?", (time.time(),))
             try:
-                db.execute("INSERT INTO jobs VALUES (?,?)", (owner, time.time()+300))
+                db.execute("INSERT INTO jobs VALUES (?,?)", (owner, time.time()+600))
             except sqlite3.IntegrityError:
                 raise ValueError("Запрос уже выполняется. Дождитесь результата")
         try:

@@ -130,6 +130,13 @@ class AppTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             ProgramResult.model_validate(RESULT | {'status':'needs_clarification'})
 
+    def test_hidden_equipment_and_grouped_exercises_rejected(self):
+        for name in ['Тяга резинкой/имитация','Отжимания от возвышенности','Цепь A — 2 круга']:
+            data=copy.deepcopy(RESULT)
+            data['program']['workouts'][0]['exercises'][0]['name']=name
+            with self.assertRaises(ValueError):
+                check_program(ProgramResult.model_validate(data).program,Profile.model_validate(PROFILE))
+
     def test_security_headers_and_page(self):
         r=self.client.get('/')
         self.assertEqual(r.status_code,200)
@@ -173,10 +180,10 @@ class GigaTests(unittest.TestCase):
             calls.append(1)
             return 'invalid' if len(calls)==1 else json.dumps(RESULT)
         g.content=content
-        self.assertEqual(g.structured('generate',{},ProgramResult).status,'ready')
+        self.assertEqual(g.request_structured('Test schema',{},ProgramResult).status,'ready')
         self.assertEqual(len(calls),2)
         calls.clear();g.content=lambda messages: calls.append(1) or 'invalid'
-        with self.assertRaises(LLMError):g.structured('generate',{},ProgramResult)
+        with self.assertRaises(LLMError):g.request_structured('Test schema',{},ProgramResult)
         self.assertEqual(len(calls),2)
 
 

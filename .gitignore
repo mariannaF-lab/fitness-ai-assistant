@@ -13,3 +13,4 @@ data/
 .deps/
 .validation-deps/
 .pytest_cache/
+reports/*results.json

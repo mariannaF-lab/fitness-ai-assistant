@@ -38,8 +38,8 @@ class Profile(StrictModel):
 class Exercise(StrictModel):
     name: str = Field(min_length=2, max_length=150)
     sets: int = Field(ge=1, le=10)
-    repetitions: str | None = Field(default=None, max_length=40)
-    seconds: int | None = Field(default=None, ge=5, le=3600)
+    repetitions: str | None = Field(default=None, max_length=40, description='Только число или диапазон: 10 или 8-12. Без слов. null при seconds.')
+    seconds: int | None = Field(default=None, ge=5, le=3600, description='Целое число секунд, не диапазон. null при repetitions.')
     rest_seconds: int = Field(ge=0, le=600)
     equipment: list[str] = Field(max_length=10)
     technique: str = Field(min_length=3, max_length=1000)
@@ -81,7 +81,7 @@ class Program(StrictModel):
 class ProgramResult(StrictModel):
     status: Literal["ready", "needs_clarification", "requires_professional_review"]
     message: str = Field(max_length=2000)
-    questions: list[str] = Field(max_length=3)
+    questions: list[str] = Field(max_length=3, description='Пустой список при ready. Только вопросы для уточнения до создания программы.')
     changes: list[str] = Field(default_factory=list, max_length=20)
     program: Program | None
 
@@ -137,6 +137,7 @@ class Feedback(StrictModel):
 
 
 def check_program(program: Program, profile: Profile):
+    import re
     if len(program.workouts) != profile.sessions_per_week:
         raise ValueError("Количество тренировок не совпадает с анкетой")
     if len({w.day for w in program.workouts}) != len(program.workouts):
@@ -147,9 +148,15 @@ def check_program(program: Program, profile: Profile):
             raise ValueError("Превышено доступное время")
         seconds = (w.warmup_minutes + w.cooldown_minutes) * 60
         for e in w.exercises:
+            if re.search(r'\b(цепь|круг)\s+[a-zа-я0-9]',e.name,re.IGNORECASE):
+                raise ValueError('Каждая запись exercises должна описывать одно упражнение, а не цепь или круг из нескольких')
+            implicit = {'резинк':'резин', 'гантел':'гантел', 'штанг':'штанг', 'стул':'стул', 'стол':'стол', 'возвышен':'опор'}
+            for term, stem in implicit.items():
+                if term in e.name.casefold() and not any(stem in item or term in item for item in allowed):
+                    raise ValueError('В названии упражнения указан неподтверждённый инвентарь или опора; замените упражнение, не скрывайте оборудование в пустом списке')
             if not {x.casefold() for x in e.equipment}.issubset(allowed):
                 raise ValueError("Используется отсутствующее оборудование")
             reps = int(e.repetitions.replace('–', '-').split('-')[-1]) if e.repetitions else 0
             seconds += e.sets * (e.seconds or reps * 3) + (e.sets - 1) * e.rest_seconds
         if seconds > w.duration_minutes * 60:
-            raise ValueError("Подходы, отдых и разминка не помещаются во время занятия")
+            raise ValueError(f"День {w.day}: подходы, отдых, разминка и завершение требуют минимум {seconds} сек., доступно {w.duration_minutes*60} сек.")

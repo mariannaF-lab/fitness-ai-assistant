@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from pydantic import ValidationError
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
+from telegram.request import HTTPXRequest
 
 from fitness.llm import LLMError
 from fitness.models import Profile
@@ -245,7 +246,13 @@ def main():
     if not token:
         raise SystemExit("Добавьте TELEGRAM_BOT_TOKEN в локальный .env. Создайте бота через @BotFather в Telegram.")
     bot = FitnessBot(Service(Store()))
-    app = Application.builder().token(token).build()
+    proxy = os.getenv("TELEGRAM_PROXY_URL") or None
+    builder = Application.builder().token(token)
+    if proxy:
+        builder = builder.request(HTTPXRequest(proxy_url=proxy)).get_updates_request(HTTPXRequest(proxy_url=proxy))
+    async def ready(application):
+        print("Telegram подключён. Бот готов принимать /start.", flush=True)
+    app = builder.post_init(ready).build()
     for command in ["start","help","cancel","resume","profile","history","program","generate","confirm","explain","adapt","feedback"]:
         app.add_handler(CommandHandler(command, bot.command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, bot.message))

@@ -1,5 +1,6 @@
 import json
 import os
+import ssl
 import threading
 import time
 import uuid
@@ -9,6 +10,9 @@ import httpx
 
 class LLMError(Exception):
     pass
+
+
+PROMPT_VERSION = '2.0'
 
 
 SYSTEM = """Ты — ИИ-гид по фитнес-программам для взрослых 18+. Отвечай по-русски.
@@ -27,6 +31,39 @@ SYSTEM = """Ты — ИИ-гид по фитнес-программам для �
 Статус ready возможен только при заполненном результате. При других статусах
 результат null, укажи причины и вопросы. Все текстовые поля на русском."""
 
+SYSTEM += """\nОбязательные уточнения:
+Не называй упражнения гарантированно безопасными для суставов или спины.
+Не добавляй нормы питания, воды и сна: задача ограничена тренировками.
+Никаких автоматических еженедельных прибавок. Изменение нагрузки только после
+оценки выполнения, самочувствия и восстановления, с подтверждением пользователя.
+Не используй стол, стул, ролик, полотенце и другую неуказанную опору или инвентарь
+даже при пустом equipment. Пол и стена допускаются как среда занятий.
+Расписание должно соответствовать описанным интервалам восстановления.
+RPE и другие сокращения объясняй словами, не используй непонятные названия.
+В готовой программе status=ready и questions=[] ОБЯЗАТЕЛЬНО. Просьбу оставить
+отзыв помести в message или progression, а не в questions. questions нужны
+ТОЛЬКО при status=needs_clarification и program=null.
+repetitions — только строка вида "10" или "8-12", без слов, единиц и уточнений
+"на сторону". seconds — только целое число, не диапазон и не строка с единицами.
+На каждую сторону и особенности выполнения опиши в technique.
+Каждый элемент exercises — ОДНО упражнение. Нельзя записывать целый круг,
+цепь, комплекс или набор движений в одну запись: перечисли их отдельно.
+Для пустого equipment не используй отжимания от возвышенности и тягу резинкой
+даже как альтернативу; выбери упражнения без предметов, например от стены.
+В progression опиши критерии для обсуждения изменений по обратной связи,
+а не заранее назначенный план прибавок через неделю или две.
+Для начинающего предпочитай компактную программу: 3 отдельных упражнения
+на занятие, обычно по 2 подхода. Не заполняй всё время большим объёмом:
+оставь запас минимум 5 минут для спокойных переходов и дополнительного отдыха.
+Для 20 минут уменьши основную часть, сохрани разминку и завершение.
+Для времени сервер использует нижнюю оценку:
+60*(warmup_minutes+cooldown_minutes) + сумма по упражнениям
+[sets*(seconds либо верхняя граница repetitions * 3) + (sets-1)*rest_seconds].
+Эта сумма НЕ ДОЛЖНА превышать duration_minutes*60 и доступное время профиля.
+Оставь запас на переходы. При сокращении до 20 минут реально сократи упражнения
+и подходы; не ограничивайся изменением duration_minutes. Для повторений на каждую
+сторону учитывай обе стороны во времени. Верни полный план, не сокращённые поля."""
+
 TASKS = {
     "generate": "Составь программу на неделю. Укажи тренировочные дни (1–7), восстановление, разминку и завершение, упражнения, подходы, повторения ИЛИ секунды, отдых, технику, выбор нагрузки и дальнейшую адаптацию. Объясни связь с целью. Время приблизительное. Попроси обратную связь.",
     "adapt": "Предложи полную новую версию недельной программы по профилю, текущему плану и отзывам. Сохрани подходящие элементы. В changes укажи изменения и причины. Не считай пропуск признаком чрезмерной нагрузки без выяснения причины. Не утверждай, что изменения применены: нужно подтверждение пользователя.",
@@ -38,7 +75,12 @@ class GigaChat:
     def __init__(self, transport=None):
         self.model = os.getenv("GIGACHAT_MODEL", "")
         self.credentials = os.getenv("GIGACHAT_CREDENTIALS", "")
-        self.client = httpx.Client(timeout=75, verify=os.getenv("GIGACHAT_CA_BUNDLE") or True, transport=transport)
+        # Include certificates trusted by Windows as well as standard TLS verification.
+        tls = ssl.create_default_context()
+        if os.getenv("GIGACHAT_CA_BUNDLE"):
+            tls.load_verify_locations(os.environ["GIGACHAT_CA_BUNDLE"])
+        self.client = httpx.Client(timeout=75, verify=tls,
+            proxies=(os.getenv("GIGACHAT_PROXY_URL") or None) if transport is None else None, transport=transport)
         self._token = ""
         self._expires = 0
         self._lock = threading.Lock()
@@ -94,18 +136,36 @@ class GigaChat:
         raise LLMError("Лимит запросов GigaChat. Попробуйте позже")
 
     def structured(self, task, data, schema, extra_check=None):
-        messages = [{"role": "system", "content": SYSTEM + "\n" + TASKS[task] +
+        if task in {'generate','adapt'}:
+            from .planner import generate
+            result = generate(self,task,data)
+            if extra_check:
+                extra_check(result)
+            return result
+        return self.request_structured(SYSTEM+'\n'+TASKS[task],data,schema,extra_check)
+
+    def request_structured(self, instruction, data, schema, extra_check=None):
+        messages = [{"role": "system", "content": instruction +
                      "\nJSON Schema:\n" + json.dumps(schema.model_json_schema(), ensure_ascii=False)},
                     {"role": "user", "content": json.dumps(data, ensure_ascii=False)}]
         for attempt in range(2):
             raw = self.content(messages)
             try:
-                parsed = schema.model_validate_json(raw)
+                # Removing a single surrounding JSON fence changes syntax only, not the plan.
+                text=raw.strip()
+                if text.startswith('```json\n') and text.endswith('```'):
+                    text=text[8:-3].strip()
+                parsed = schema.model_validate_json(text)
                 if extra_check:
                     extra_check(parsed)
                 return parsed
-            except ValueError:
+            except ValueError as error:
                 if attempt:
                     raise LLMError("Модель дважды вернула некорректную структуру или нагрузку. Программа не сохранена; попробуйте снова") from None
-                # Do not echo raw provider output or profile-bearing validation errors.
-                messages.append({"role": "user", "content": "Предыдущий результат не прошёл проверку. Верни JSON строго по схеме; проверь статус, оборудование, количество занятий и суммарное время всех подходов и отдыха."})
+                # Only field paths and messages; never echo Pydantic input values.
+                if hasattr(error, 'errors'):
+                    detail = '; '.join('.'.join(map(str,e['loc']))+': '+e['msg'] for e in error.errors(include_input=False,include_context=False))
+                else:
+                    detail = str(error)
+                messages.append({"role": "assistant", "content": raw})
+                messages.append({"role": "user", "content": "Исправь предыдущий JSON. Ошибка проверки: "+detail[:1800]+". Верни полный JSON по исходной схеме. Сохрани исходные ограничения; используй только допустимые идентификаторы из входных данных."})
