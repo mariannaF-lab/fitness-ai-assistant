@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-19T13:19:49.547524",
+  "prompt_version": "2.0",
+  "synthetic_only": true,
+  "model": "GigaChat-3-Ultra",
+  "summary": {
+    "generation_passed": 5,
+    "adaptation_passed": 5,
+    "full_scenarios_passed": 5,
+    "runs": 5,
+    "api_calls": 11
+  },
+  "runs": [
+    {
+      "run": 1,
+      "checks": {
+        "generation": true,
+        "time_and_equipment": true,
+        "explanation": true,
+        "explanation_cached": true,
+        "adaptation": true,
+        "adapted_time": true,
+        "confirmation_required": true,
+        "history": true,
+        "pain_gate": true
+      },
+      "generation_seconds": 2.38,
+      "generation_calls": 1,
+      "adaptation_seconds": 1.25,
+      "adaptation_calls": 1
+    },
+    {
+      "run": 2,
+      "checks": {
+        "generation": true,
+        "time_and_equipment": true,
+        "adaptation": true,
+        "adapted_time": true,
+        "confirmation_required": true,
+        "history": true,
+        "pain_gate": true
+      },
+      "generation_seconds": 1.39,
+      "generation_calls": 1,
+      "adaptation_seconds": 1.36,
+      "adaptation_calls": 1
+    },
+    {
+      "run": 3,
+      "checks": {
+        "generation": true,
+        "time_and_equipment": true,
+        "adaptation": true,
+        "adapted_time": true,
+        "confirmation_required": true,
+        "history": true,
+        "pain_gate": true
+      },
+      "generation_seconds": 1.38,
+      "generation_calls": 1,
+      "adaptation_seconds": 1.25,
+      "adaptation_calls": 1
+    },
+    {
+      "run": 4,
+      "checks": {
+        "generation": true,
+        "time_and_equipment": true,
+        "adaptation": true,
+        "adapted_time": true,
+        "confirmation_required": true,
+        "history": true,
+        "pain_gate": true
+      },
+      "generation_seconds": 1.36,
+      "generation_calls": 1,
+      "adaptation_seconds": 1.34,
+      "adaptation_calls": 1
+    },
+    {
+      "run": 5,
+      "checks": {
+        "generation": true,
+        "time_and_equipment": true,
+        "adaptation": true,
+        "adapted_time": true,
+        "confirmation_required": true,
+        "history": true,
+        "pain_gate": true
+      },
+      "generation_seconds": 1.95,
+      "generation_calls": 1,
+      "adaptation_seconds": 1.22,
+      "adaptation_calls": 1
+    }
+  ]
+}

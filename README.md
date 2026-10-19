@@ -1,22 +1,37 @@
-# «Ритм» — ИИ-гид по фитнес-программам
+# ИИ-гид по фитнес-программам
 
-Работающий учебный прототип: сайт и Telegram-бот с GigaChat API. Исходный код приложения находится в ветке [implement-fitness-assistant](https://github.com/mariannaF-lab/fitness-ai-assistant/tree/implement-fitness-assistant).
+В этом репозитории находится навык Codex для создания учебного ИИ-ассистента: сайт с анкетой, Telegram-бот, общий сервер на Python и GigaChat API.
 
-## Материалы для сдачи
+Реализован локальный прототип: сайт «Ритм», Telegram-бот и общая серверная логика.
+Инструкции запуска и настройки секретов — в [SETUP.md](SETUP.md).
 
-- [Коммерческое предложение со скриншотами (PDF)](https://github.com/mariannaF-lab/fitness-ai-assistant/blob/implement-fitness-assistant/submission/COMMERCIAL-PROPOSAL.pdf)
-- [Текст сообщения к домашнему заданию](https://github.com/mariannaF-lab/fitness-ai-assistant/blob/implement-fitness-assistant/submission/HOMEWORK-MESSAGE.md)
-- [Полный пакет: описание, промпты, примеры и проверки](https://github.com/mariannaF-lab/fitness-ai-assistant/tree/implement-fitness-assistant/submission)
-- [Инструкция запуска](https://github.com/mariannaF-lab/fitness-ai-assistant/blob/implement-fitness-assistant/SETUP.md)
-- [Telegram-бот](https://t.me/ritm_fitness_bot)
+Материалы защиты: [пакет для сдачи](submission/README.md),
+[коммерческое предложение со скриншотами](submission/COMMERCIAL-PROPOSAL.pdf),
+[текст к домашнему заданию](submission/HOMEWORK-MESSAGE.md),
+[сценарий показа](submission/DEMO-SCRIPT.md),
+[пример реального ответа](submission/DEMO-EXAMPLE.md).
 
-Сайт запускается локально. Бот отвечает при запущенном процессе. Скриншоты показывают действующий интерфейс на сохранённых результатах реального API-теста с вымышленной анкетой. Публичный хостинг пока не настроен.
+## Приложение
+
+- `app.py` — сайт и HTTP API на Flask.
+- `bot.py` — Telegram-бот на python-telegram-bot.
+- `fitness/` — схемы Pydantic, SQLite, промпты и адаптер GigaChat.
+- `web/` — адаптивный интерфейс без сборки и внешних ресурсов.
+- `tests/` — автоматические проверки с подменным LLM.
+- `fitness/planner.py` — каталог, компактный выбор LLM и серверный расчёт нагрузки.
+- [Отчёт устойчивости](reports/STABILITY-REPORT.md) — 5 живых полных прогонов и 28 автотестов.
+
+Для локального запуска в текущем окружении: `python app.py` и в другом терминале
+`python bot.py`. Для чистого окружения сначала установите `requirements.txt`.
+Flask и python-telegram-bot выбраны вместо предварительно предложенных FastAPI
+и aiogram, поскольку доступны в рабочем окружении; оба интерфейса используют
+общие модели и сервисы. Живые запросы требуют локальной настройки `.env`.
 
 ## Навык
 
 [skills/build-fitness-assistant/SKILL.md](skills/build-fitness-assistant/SKILL.md)
 
-Внутри: согласованная архитектура и данные, сценарии интерфейсов, промпты версии 1.0, правила подключения GigaChat и план приёмки. Первая версия рассчитана на взрослых от 18 лет; планы составляются на неделю. Отдельный лендинг, питание и медицинская реабилитация не входят в объём.
+Внутри: согласованная архитектура и данные, сценарии интерфейсов, описание промптов версии 2.0, правила подключения GigaChat и план приёмки. Первая версия рассчитана на взрослых от 18 лет; планы составляются на неделю. Отдельный лендинг, питание и медицинская реабилитация не входят в объём.
 
 ## Установка в Codex
 
